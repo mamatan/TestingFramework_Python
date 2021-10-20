@@ -10,12 +10,7 @@ def ControlTableValidationCheck(SrcJoinTable, SrcJoinAlias):
     # Creates a cursor from the connection
     cursor = sql_conn.cursor()
 
-    ControlValidation = ('''SELECT concat(DatabaseName,'.' ,SchemaName ,'.' , TableName) as SrcJoinTable,
-                                TableAlias
-                     FROM [DataWarehouse].[TestResults].[TableNamesControlTableNew]
-                           where DatabaseName = \'''' + SrcJoinTable.split('.')[0] + '\'''''
-                           and SchemaName = \'''' + SrcJoinTable.split('.')[1] + '\'''''
-                           and TableName = \'''' + SrcJoinTable.split('.')[2] + '\'')
+    ControlValidation = ("EXEC [TestResults].[LkpTblName_Alias] @DBName = '" + SrcJoinTable.split('.')[0] + " ' ,@SchemaName = '" + SrcJoinTable.split('.')[1] + " ', @TableName = '" + SrcJoinTable.split('.')[2] + " ' " )
 
     cursor.execute(ControlValidation)
     row = cursor.fetchone()
@@ -43,16 +38,7 @@ sql_conn = sql.connect('DRIVER={SQL Server Native Client 11.0}; SERVER=SLC-BIDB-
 cursor = sql_conn.cursor()
 
 # Sql Statements are executed using the Cursor execute function
-cursor.execute('''select m.definition
-from DataWarehouse.sys.sql_modules       as m
-    inner join DataWarehouse.sys.objects as o
-        on m.object_id = o.object_id
-    inner join DataWarehouse.sys.schemas as s
-        on o.schema_id = s.schema_id
-where o.type = 'P'
-      and o.name not like 'sp_%'
-      and m.definition like '%' + 'From' + '%'
-      and o.name = 'RFOXTestSrcQuery_FrmControlTbl' ''')
+cursor.execute("EXEC [TestResults].[ExecSP_RFOXTestSrcQuery_FrmControlTbl]")
 
 #Returns a single record
 row = cursor.fetchone()
@@ -121,9 +107,8 @@ for i in range(j):
 
       ValidationCheck = ControlTableValidationCheck(SrcJoinTable, SrcJoinAlias)
 
-      cursor.execute('''SELECT concat(DatabaseName,'.' ,SchemaName ,'.' , TableName) as TrgtJoinTable
-                     FROM [DataWarehouse].[TestResults].[TableNamesControlTableNew]
-                           where TableAlias = \'''' + TrgtJoinAlias + '\'' )
+      cursor.execute("EXEC [TestResults].[LkpTblNameByAlias] @JoinAlias = '" + TrgtJoinAlias +  " ' " )
+
 
       TrgtJoinTable = cursor.fetchone()[0]
 
