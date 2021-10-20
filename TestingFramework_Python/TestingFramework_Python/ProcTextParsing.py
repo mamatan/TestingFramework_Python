@@ -9,7 +9,8 @@ def ControlTableValidationCheck(SrcJoinTable, SrcJoinAlias):
     # Creates a cursor from the connection
     cursor = sql_conn.cursor()
 
-    ControlValidation = ("EXEC [TestResults].[LkpTblName_Alias] @DBName = '" + SrcJoinTable.split('.')[0] + " ' ,@SchemaName = '" + SrcJoinTable.split('.')[1] + " ', @TableName = '" + SrcJoinTable.split('.')[2] + " ' " )
+    #Execute the stored proc with parameters
+    ControlValidation = ("EXEC [TestResults].[LkpTblName_Alias] @DBName = '" + SrcJoinTable.split('.')[0] + "' ,@SchemaName = '" + SrcJoinTable.split('.')[1] + "', @TableName = '" + SrcJoinTable.split('.')[2] + "'" )
 
     cursor.execute(ControlValidation)
     row = cursor.fetchone()
@@ -85,8 +86,9 @@ for i in range(j):
       SrcJoinAlias = from_stmt_list[counter]
       counter += 1
 
+      #Calling the function for ControlTable validation check
       ValidationCheck = ControlTableValidationCheck(SrcJoinTable, SrcJoinAlias)
-
+ 
       df = df.append({'SrcJoinTable' : SrcJoinTable, 'SrcJoinAlias' : SrcJoinAlias, 'SrcJoinField' : '',
                    'TrgtJoinTable' : '', 'TrgtJoinAlias' : '','TrgtJoinField' : '','TableExistsInControl' : ValidationCheck[0],
                    'AliasAndTableMatch' : ValidationCheck[1]},
@@ -104,6 +106,7 @@ for i in range(j):
       SrcJoinField = SrcJoinField[SrcJoinField.find('.') + 1:]
       counter += 1
 
+      #Calling the function for ControlTable validation check
       ValidationCheck = ControlTableValidationCheck(SrcJoinTable, SrcJoinAlias)
 
       cursor.execute("EXEC [TestResults].[LkpTblNameByAlias] @JoinAlias = '" + TrgtJoinAlias +  " ' " )
