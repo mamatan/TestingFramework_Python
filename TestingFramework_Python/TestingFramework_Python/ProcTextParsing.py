@@ -1,8 +1,7 @@
 import pyodbc as sql
 import pandas as pd
 
-#TODO: Clean up code and create functions where necessary
-#TODO: Convert in-line queries to stored procedures
+#TODO: Possible Solutions: Come up with a control table for datawarehouse objects that links to all dimensionalID's
 
 def ControlTableValidationCheck(SrcJoinTable, SrcJoinAlias):
     sql_conn = sql.connect('DRIVER={SQL Server Native Client 11.0}; SERVER=SLC-BIDB-S01; DATABASE=DataWarehouse; Trusted_Connection=yes')
