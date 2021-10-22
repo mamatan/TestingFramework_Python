@@ -4,7 +4,7 @@ import pandas as pd
 # TODO: Possible Solutions: Come up with a control table for datawarehouse objects that links to all dimensionalID's
 
 
-def ControlTableValidationCheck(SrcJoinTable, SrcJoinAlias):
+def control_table_validation_check(src_join_table, src_join_alias):
     sql_conn = sql.connect(
         'DRIVER={SQL Server Native Client 11.0}; SERVER=SLC-BIDB-S01; DATABASE=DataWarehouse; Trusted_Connection=yes')
 
@@ -12,26 +12,26 @@ def ControlTableValidationCheck(SrcJoinTable, SrcJoinAlias):
     cursor = sql_conn.cursor()
 
     # Execute the stored proc with parameters
-    ControlValidation = ("EXEC [TestResults].[LkpTblName_Alias] @DBName = '" + SrcJoinTable.split('.')[0] +
-                         "' ,@SchemaName = '" + SrcJoinTable.split('.')[1] + "', @TableName = '" + SrcJoinTable.split('.')[2] + "'")
+    control_validation = ("EXEC [TestResults].[LkpTblName_Alias] @DBName = '" + src_join_table.split('.')[0] +
+                          "' ,@SchemaName = '" + src_join_table.split('.')[1] + "', @TableName = '" + src_join_table.split('.')[2] + "'")
 
-    cursor.execute(ControlValidation)
+    cursor.execute(control_validation)
     row = cursor.fetchone()
-    TableExists = False
-    AliasMatches = False
+    table_exists = False
+    alias_matches = False
     # first check is if exists
     if row is not None:
-        TableExists = True
+        table_exists = True
 
         # then check is if alias matches passed in table name
         #row = cursor.fetchone()
-        ControlTable = row[0]
-        ControlAlias = row[1]
+        control_table = row[0]
+        control_alias = row[1]
 
-        if SrcJoinTable == ControlTable and SrcJoinAlias == ControlAlias:
-            AliasMatches = True
+        if src_join_table == control_table and src_join_alias == control_alias:
+            alias_matches = True
 
-    return [TableExists, AliasMatches]
+    return [table_exists, alias_matches]
 
 
 # Connect to Test Sql Server
@@ -78,52 +78,52 @@ print(j)
 counter = 0
 
 for i in range(j):
-    SrcJoinTable = ''
-    SrcJoinAlias = ''
-    SrcJoinField = ''
-    TrgtJoinTable = ''
-    TrgtJoinAlias = ''
-    TrgtJoinField = ''
+    src_join_table = ''
+    src_join_alias = ''
+    src_join_field = ''
+    trgt_join_table = ''
+    trgt_join_alias = ''
+    trgt_join_field = ''
 
     if i == 0:
-        SrcJoinTable = from_stmt_list[counter]
+        src_join_table = from_stmt_list[counter]
         counter += 1
-        SrcJoinAlias = from_stmt_list[counter]
+        src_join_alias = from_stmt_list[counter]
         counter += 1
 
         # Calling the function for ControlTable validation check
-        ValidationCheck = ControlTableValidationCheck(
-            SrcJoinTable, SrcJoinAlias)
+        validation_check = control_table_validation_check(
+            src_join_table, src_join_alias)
 
-        df = df.append({'SrcJoinTable': SrcJoinTable, 'SrcJoinAlias': SrcJoinAlias, 'SrcJoinField': '',
-                        'TrgtJoinTable': '', 'TrgtJoinAlias': '', 'TrgtJoinField': '', 'TableExistsInControl': ValidationCheck[0],
-                        'AliasAndTableMatch': ValidationCheck[1]},
+        df = df.append({'SrcJoinTable': src_join_table, 'SrcJoinAlias': src_join_alias, 'SrcJoinField': '',
+                        'TrgtJoinTable': '', 'TrgtJoinAlias': '', 'TrgtJoinField': '', 'TableExistsInControl': validation_check[0],
+                        'AliasAndTableMatch': validation_check[1]},
                        ignore_index=True)
     else:
-        SrcJoinTable = from_stmt_list[counter]
+        src_join_table = from_stmt_list[counter]
         counter += 1
-        SrcJoinAlias = from_stmt_list[counter]
+        src_join_alias = from_stmt_list[counter]
         counter += 1
-        TrgtJoinField = from_stmt_list[counter]
-        TrgtJoinAlias = TrgtJoinField[:TrgtJoinField.find('.')]
-        TrgtJoinField = TrgtJoinField[TrgtJoinField.find('.') + 1:]
+        trgt_join_field = from_stmt_list[counter]
+        trgt_join_alias = trgt_join_field[:trgt_join_field.find('.')]
+        trgt_join_field = trgt_join_field[trgt_join_field.find('.') + 1:]
         counter += 1
-        SrcJoinField = from_stmt_list[counter]
-        SrcJoinField = SrcJoinField[SrcJoinField.find('.') + 1:]
+        src_join_field = from_stmt_list[counter]
+        src_join_field = src_join_field[src_join_field.find('.') + 1:]
         counter += 1
 
         # Calling the function for ControlTable validation check
-        ValidationCheck = ControlTableValidationCheck(
-            SrcJoinTable, SrcJoinAlias)
+        validation_check = control_table_validation_check(
+            src_join_table, src_join_alias)
 
         cursor.execute(
-            "EXEC [TestResults].[LkpTblNameByAlias] @JoinAlias = '" + TrgtJoinAlias + " ' ")
+            "EXEC [TestResults].[LkpTblNameByAlias] @JoinAlias = '" + trgt_join_alias + " ' ")
 
-        TrgtJoinTable = cursor.fetchone()[0]
+        trgt_join_table = cursor.fetchone()[0]
 
-        df = df.append({'SrcJoinTable': SrcJoinTable, 'SrcJoinAlias': SrcJoinAlias, 'SrcJoinField': SrcJoinField,
-                       'TrgtJoinTable': TrgtJoinTable, 'TrgtJoinAlias': TrgtJoinAlias, 'TrgtJoinField': TrgtJoinField,
-                        'TableExistsInControl': ValidationCheck[0], 'AliasAndTableMatch': ValidationCheck[1]}, ignore_index=True)
+        df = df.append({'SrcJoinTable': src_join_table, 'SrcJoinAlias': src_join_alias, 'SrcJoinField': src_join_field,
+                       'TrgtJoinTable': trgt_join_table, 'TrgtJoinAlias': trgt_join_alias, 'TrgtJoinField': trgt_join_field,
+                        'TableExistsInControl': validation_check[0], 'AliasAndTableMatch': validation_check[1]}, ignore_index=True)
 
 # Close the sql connection
 sql_conn.close()
