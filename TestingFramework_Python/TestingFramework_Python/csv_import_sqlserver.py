@@ -59,4 +59,3 @@ sql_conn.commit()
 sql_conn.close()
 
 
-#This is new stuff
