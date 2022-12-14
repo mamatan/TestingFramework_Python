@@ -54,8 +54,8 @@ cursor.execute('Drop table if exists %s;' %(tbl_name))
 #Create table
 cursor.execute('Create Table %s (%s)' %(tbl_name,col_str)) 
 print('table was created successfully'.format(tbl_name))
-# sql_conn.commit()
-# sql_conn.close()
+sql_conn.commit()
+sql_conn.close()
 
 
 #Insert values to table
