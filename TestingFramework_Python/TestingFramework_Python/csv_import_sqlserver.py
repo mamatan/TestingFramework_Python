@@ -59,6 +59,3 @@ sql_conn.commit()
 sql_conn.close()
 
 
-#Insert values to table
-
-
