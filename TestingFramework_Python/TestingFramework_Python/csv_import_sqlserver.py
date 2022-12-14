@@ -18,6 +18,7 @@ clean_tbl_name = file.lower().replace(' ', '_').replace('?','') \
                       .replace('-','_').replace(r'/','_').replace('\\','_').replace('%','') \
                       .replace(')','').replace(r'(','').replace('$','')
 tbl_name = format(clean_tbl_name.split('.') [0])
+schema_name = 'TestResults.'
 print(tbl_name)
 
 # Clean column names:
@@ -49,10 +50,10 @@ cursor = sql_conn.cursor()
 print('opened db successfully')
 
 #Drop tables with same name
-cursor.execute('Drop table if exists %s;' %(tbl_name))
+cursor.execute('Drop table if exists %s %s;' %(schema_name,tbl_name))
 
 #Create table
-cursor.execute('Create Table %s (%s)' %(tbl_name,col_str)) 
+cursor.execute('Create Table %s %s (%s)' %(schema_name,tbl_name,col_str)) 
 print('table was created successfully'.format(tbl_name))
 sql_conn.commit()
 sql_conn.close()
