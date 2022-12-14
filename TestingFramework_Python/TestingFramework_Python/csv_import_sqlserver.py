@@ -60,4 +60,6 @@ sql_conn.close()
 
 
 #Insert values to table
+# Brad was here
 
+print('hello brad')
