@@ -17,7 +17,8 @@ file = 'INT072_Candidates_202209021232.csv'
 clean_tbl_name = file.lower().replace(' ', '_').replace('?','') \
                       .replace('-','_').replace(r'/','_').replace('\\','_').replace('%','') \
                       .replace(')','').replace(r'(','').replace('$','')
-print(clean_tbl_name)
+tbl_name = format(clean_tbl_name.split('.') [0])
+print(tbl_name)
 
 # Clean column names:
 #all lower case 
@@ -43,4 +44,19 @@ col_str = ',' .join('{} {}'.format(n, d) for (n, d) in zip(df.columns,df.dtypes.
 print(col_str)
 
 # Open a database coonection
+sql_conn = sql.connect('DRIVER={SQL Server Native Client 11.0}; SERVER=SLC-BIDB-S01; DATABASE=DataWarehouse; Trusted_Connection=yes')
+cursor = sql_conn.cursor()
+print('opened db successfully')
+
+#Drop tables with same name
+cursor.execute('Drop table if exists %s;' %(tbl_name))
+
+#Create table
+cursor.execute('Create Table %s (%s)' %(tbl_name,col_str)) 
+print('table was created successfully'.format(tbl_name))
+# sql_conn.commit()
+# sql_conn.close()
+
+
+#Insert values to table
 
